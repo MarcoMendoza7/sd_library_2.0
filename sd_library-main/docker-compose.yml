@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # API GATEWAY (Node.js) - Puerto 3000
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - biblioteca-net
+    depends_on:
+      - ms-libros
+      - ms-autores
+
+  # MS LIBROS (PHP) - Puerto 8001
+  ms-libros:
+    build: ./ms-libros
+    container_name: ms-libros
+    ports:
+      - "8001:80"
+    volumes:
+      - ./logs:/var/www/html/logs
+    networks:
+      - biblioteca-net
+    depends_on:
+      - mysql-db
+
+  # MS AUTORES (Node.js) - Puerto 8002
+  ms-autores:
+    build: ./ms-autores
+    container_name: ms-autores
+    ports:
+      - "8002:8002"
+    networks:
+      - biblioteca-net
+    depends_on:
+      - mongo-db
+
+  # FRONTEND (React) - Puerto 3001
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    networks:
+      - biblioteca-net
+
+  # BASE DE DATOS MYSQL
+  mysql-db:
+    image: mysql:8
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: biblioteca_relacional
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - biblioteca-net
+
+  # BASE DE DATOS MONGODB
+  mongo-db:
+    image: mongo
+    container_name: mongo-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - biblioteca-net
+
+networks:
+  biblioteca-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  mongo_data:

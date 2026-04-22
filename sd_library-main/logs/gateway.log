@@ -1,0 +1,40 @@
+
+[2026-04-15T18:12:17.784Z] --- LOG DEV (Petición #5) ---
+Petición enviada: POST /api/libros
+Resultado dado: HTTP 200
+----------------------------------
+
+[2026-04-15T18:14:30.542Z] --- LOG DEV (Petición #10) ---
+Petición enviada: GET /api/autores
+Resultado dado: HTTP 304
+----------------------------------
+
+[2026-04-15T18:15:53.090Z] --- LOG DEV (Petición #15) ---
+Petición enviada: GET /api/libros
+Resultado dado: HTTP 200
+----------------------------------
+
+[2026-04-15T18:26:04.277Z] --- LOG DEV (Petición #20) ---
+Petición enviada: POST /api/libros
+Resultado dado: HTTP 200
+----------------------------------
+
+[2026-04-15T18:42:06.864Z] --- LOG DEV (Petición #25) ---
+Petición enviada: GET /api/autores
+Resultado dado: HTTP 304
+----------------------------------
+
+[2026-04-15T18:53:31.598Z] --- LOG DEV (Petición #5) ---
+Petición enviada: GET /api/libros
+Resultado dado: HTTP 200
+----------------------------------
+
+[2026-04-15T18:56:03.762Z] --- LOG DEV (Petición #10) ---
+Petición enviada: GET /api/autores
+Resultado dado: HTTP 304
+----------------------------------
+
+[2026-04-15T19:40:57.139Z] --- LOG DEV (Petición #15) ---
+Petición enviada: GET /api/autores
+Resultado dado: HTTP 200
+----------------------------------

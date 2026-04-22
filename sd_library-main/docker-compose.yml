@@ -14,6 +14,24 @@ services:
     depends_on:
       - ms-libros
       - ms-autores
+      - ms-usuarios # Ahora el Gateway espera a que el servicio de usuarios esté listo
+
+  # MS USUARIOS (Node.js) - NUEVO INTEGRANTE - Puerto 8003
+  ms-usuarios:
+    build: ./ms-usuarios
+    container_name: ms-usuarios
+    ports:
+      - "8003:8003"
+    environment:
+      - DB_HOST=mysql-db
+      - DB_USER=root
+      - DB_PASSWORD=admin
+      - DB_NAME=biblioteca_relacional
+      - JWT_SECRET=SECRET_KEY_PIOLIN
+    networks:
+      - biblioteca-net
+    depends_on:
+      - mysql-db
 
   # MS LIBROS (PHP) - Puerto 8001
   ms-libros:
@@ -62,7 +80,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Asegúrate de que el init.sql tenga la tabla usuarios
     networks:
       - biblioteca-net
 

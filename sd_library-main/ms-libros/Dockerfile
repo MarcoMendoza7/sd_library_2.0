@@ -11,4 +11,9 @@ RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/Allo
 
 COPY src/ /var/www/html/
 
+# Crear carpeta de uploads y dar permisos
+RUN mkdir -p /var/www/html/uploads && \
+    chown -R www-data:www-data /var/www/html/uploads && \
+    chmod -R 755 /var/www/html/uploads
+
 EXPOSE 80

@@ -41,10 +41,12 @@ services:
       - "8001:80"
     volumes:
       - ./logs:/var/www/html/logs
+      - ./ms-libros/uploads:/var/www/html/uploads
     networks:
       - biblioteca-net
     depends_on:
       - mysql-db
+    
 
   # MS AUTORES (Node.js) - Puerto 8002
   ms-autores:

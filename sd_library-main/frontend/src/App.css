@@ -419,3 +419,8 @@ h1, h2, h3, .logo-icon {
   text-align: center;
   margin-top: 40px;
 }
+
+.grid-libros { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+.card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; background: #f9f9f9; }
+.btn-download { display: inline-block; margin-top: 10px; padding: 8px 12px; background: #ffcc00; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
+.auth-form, .upload-form { max-width: 400px; margin: 50px auto; display: flex; flex-direction: column; gap: 15px; }

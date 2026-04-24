@@ -1,0 +1,27 @@
+﻿api-gateway  | 
+api-gateway  | > api-gateway@1.0.0 start
+api-gateway  | > node src/index.js
+api-gateway  | 
+api-gateway  | [HPM] Proxy created: /  -> http://ms-libros:80
+api-gateway  | [HPM] Proxy rewrite rule created: "^/api/libros" ~> ""
+api-gateway  | [HPM] Proxy created: /  -> http://ms-autores:8002
+api-gateway  | [HPM] Proxy rewrite rule created: "^/api/autores" ~> "/autores"
+api-gateway  | Gateway escuchando en el puerto 3000
+api-gateway  | 
+api-gateway  | --- LOG DEV (Petici├│n #5) ---
+api-gateway  | Petici├│n enviada: POST /api/autores
+api-gateway  | Resultado dado: HTTP 201
+api-gateway  | ----------------------------------
+api-gateway  | 
+api-gateway  | 
+api-gateway  | --- LOG DEV (Petici├│n #10) ---
+api-gateway  | Petici├│n enviada: GET /api/libros
+api-gateway  | Resultado dado: HTTP 200
+api-gateway  | ----------------------------------
+api-gateway  | 
+api-gateway  | 
+api-gateway  | --- LOG DEV (Petici├│n #15) ---
+api-gateway  | Petici├│n enviada: PUT /api/libros/8
+api-gateway  | Resultado dado: HTTP 200
+api-gateway  | ----------------------------------
+api-gateway  | 

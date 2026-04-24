@@ -8,13 +8,13 @@ function App() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user_piolin')));
   const [view, setView] = useState('home'); 
 
-  // Estado para formularios
   const [libroData, setLibroData] = useState({ 
     titulo: '', autor: '', genero: '', anio: '', visibilidad: 'publico' 
   });
   const [editMode, setEditMode] = useState(null); 
   const [file, setFile] = useState(null);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [registerData, setRegisterData] = useState({ nombre: '', email: '', password: '' });
 
   useEffect(() => { fetchLibros(); }, [user]);
 
@@ -28,68 +28,20 @@ function App() {
     } catch (err) { console.error("Error al cargar libros"); }
   };
 
-  const handleUploadOrUpdate = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token_piolin');
-    
-    // FormData es necesario para enviar archivos
-    const formData = new FormData();
-    formData.append('titulo', libroData.titulo);
-    formData.append('autor', libroData.autor);
-    formData.append('genero', libroData.genero);
-    formData.append('anio', libroData.anio);
-    formData.append('visibilidad', libroData.visibilidad);
-    
-    if (file) {
-      formData.append('pdf_file', file);
-    }
-
-    let url = `${API_BASE}/libros`;
-    let method = 'POST';
-
-    if (editMode) {
-      // Truco: Usamos POST pero enviamos el ID en la URL para que el PHP sepa que es PUT
-      url = `${API_BASE}/libros/${editMode}`;
-      formData.append('_method', 'PUT'); 
-    }
-
-    const res = await fetch(url, {
-      method: 'POST', // Siempre POST para que el body con archivos llegue bien
-      headers: { 'Authorization': token },
-      body: formData
+    const res = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(registerData)
     });
-
     if (res.ok) {
-      alert(editMode ? "¡Libro actualizado!" : "¡Libro publicado!");
-      setEditMode(null);
-      setFile(null);
-      setLibroData({ titulo: '', autor: '', genero: '', anio: '', visibilidad: 'publico' });
-      setView('home');
-      fetchLibros();
+      alert("Cuenta creada");
+      setView('login');
     } else {
-      alert("Error al procesar la solicitud");
+      const data = await res.json();
+      alert(data.error);
     }
-  };
-
-  const eliminarLibro = async (id) => {
-    if (!window.confirm("¿Seguro que quieres borrar este libro?")) return;
-    const res = await fetch(`${API_BASE}/libros/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': localStorage.getItem('token_piolin') }
-    });
-    if (res.ok) fetchLibros();
-  };
-
-  const prepararEdicion = (libro) => {
-    setLibroData({ 
-        titulo: libro.titulo, 
-        autor: libro.autor_id, 
-        genero: libro.genero, 
-        anio: libro.anio, 
-        visibilidad: libro.visibilidad 
-    });
-    setEditMode(libro.id);
-    setView('upload');
   };
 
   const handleLogin = async (e) => {
@@ -107,6 +59,59 @@ function App() {
       setUser(sessionUser);
       setView('home');
     } else { alert(data.error); }
+  };
+
+  const handleUploadOrUpdate = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token_piolin');
+    const formData = new FormData();
+    formData.append('titulo', libroData.titulo);
+    formData.append('autor', libroData.autor);
+    formData.append('genero', libroData.genero);
+    formData.append('anio', libroData.anio);
+    formData.append('visibilidad', libroData.visibilidad);
+    if (file) formData.append('pdf_file', file);
+
+    let url = `${API_BASE}/libros`;
+    if (editMode) {
+      url = `${API_BASE}/libros/${editMode}`;
+      formData.append('_method', 'PUT'); 
+    }
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Authorization': token },
+      body: formData
+    });
+
+    if (res.ok) {
+      setEditMode(null);
+      setFile(null);
+      setLibroData({ titulo: '', autor: '', genero: '', anio: '', visibilidad: 'publico' });
+      setView('home');
+      fetchLibros();
+    }
+  };
+
+  const eliminarLibro = async (id) => {
+    if (!window.confirm("¿Seguro?")) return;
+    const res = await fetch(`${API_BASE}/libros/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': localStorage.getItem('token_piolin') }
+    });
+    if (res.ok) fetchLibros();
+  };
+
+  const prepararEdicion = (libro) => {
+    setLibroData({ 
+        titulo: libro.titulo, 
+        autor: libro.autor_id, 
+        genero: libro.genero, 
+        anio: libro.anio, 
+        visibilidad: libro.visibilidad 
+    });
+    setEditMode(libro.id);
+    setView('upload');
   };
 
   const logout = () => {
@@ -128,7 +133,10 @@ function App() {
               <button onClick={logout}>Salir ({user.nombre})</button>
             </>
           ) : (
-            <button onClick={() => setView('login')}>Entrar</button>
+            <>
+              <button onClick={() => setView('login')}>Entrar</button>
+              <button onClick={() => setView('register')}>Crear Cuenta</button>
+            </>
           )}
         </nav>
       </header>
@@ -148,8 +156,10 @@ function App() {
                     <span className={`badge ${l.visibilidad}`}>{l.visibilidad}</span>
                   </div>
                   <div className="card-actions">
-                    {l.puedo_leer && (
-                      <a href={`http://localhost:3000/api/libros/uploads/${l.pdf_url}`} target="_blank" rel="noreferrer" className="btn-read">Leer</a>
+                    {user ? (
+                      <a href={`http://localhost:3000/api/libros/uploads/${l.pdf_url}`} target="_blank" rel="noreferrer" className="btn-read" download>Descargar</a>
+                    ) : (
+                      <button className="btn-locked" onClick={() => setView('login')}>Inicia sesión para leer</button>
                     )}
                     {view === 'perfil' && (
                       <>
@@ -160,9 +170,27 @@ function App() {
                   </div>
                 </div>
               ))}
-              {view === 'perfil' && libros.filter(l => l.user_id == user?.id).length === 0 && <p>No has subido libros aún.</p>}
             </div>
           </div>
+        )}
+
+        {view === 'register' && (
+          <form className="auth-form" onSubmit={handleRegister}>
+            <h2>Crear Cuenta</h2>
+            <input type="text" placeholder="Nombre" required onChange={e => setRegisterData({...registerData, nombre: e.target.value})} />
+            <input type="email" placeholder="Email" required onChange={e => setRegisterData({...registerData, email: e.target.value})} />
+            <input type="password" placeholder="Password" required onChange={e => setRegisterData({...registerData, password: e.target.value})} />
+            <button type="submit">Registrarse</button>
+          </form>
+        )}
+
+        {view === 'login' && (
+           <form className="auth-form" onSubmit={handleLogin}>
+             <h2>Entrar</h2>
+             <input type="email" placeholder="Email" required onChange={e => setLoginData({...loginData, email: e.target.value})} />
+             <input type="password" placeholder="Pass" required onChange={e => setLoginData({...loginData, password: e.target.value})} />
+             <button type="submit">Entrar</button>
+           </form>
         )}
 
         {view === 'upload' && (
@@ -176,23 +204,11 @@ function App() {
                <option value="publico">Público</option>
                <option value="privado">Privado</option>
              </select>
-             
              <div className="file-input-container">
                 <label>{editMode ? "Actualizar PDF (opcional):" : "Archivo PDF:"}</label>
                 <input type="file" accept=".pdf" required={!editMode} onChange={e => setFile(e.target.files[0])} />
              </div>
-
              <button type="submit">{editMode ? 'Guardar Cambios' : 'Publicar'}</button>
-             {editMode && <button type="button" className="btn-cancel" onClick={() => {setEditMode(null); setView('perfil');}}>Cancelar</button>}
-           </form>
-        )}
-
-        {view === 'login' && (
-           <form className="auth-form" onSubmit={handleLogin}>
-             <h2>Entrar</h2>
-             <input type="email" placeholder="Email" required onChange={e => setLoginData({...loginData, email: e.target.value})} />
-             <input type="password" placeholder="Pass" required onChange={e => setLoginData({...loginData, password: e.target.value})} />
-             <button type="submit">Entrar</button>
            </form>
         )}
       </main>

@@ -8,13 +8,11 @@
 
 .App { text-align: center; font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; min-height: 100vh; }
 
-/* Navbar */
 .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 .navbar h1 { font-size: 1.5rem; color: var(--piolin-dark); }
 .navbar button { margin-left: 10px; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; background: var(--piolin-yellow); font-weight: bold; transition: 0.3s; }
 .navbar button:hover { opacity: 0.8; }
 
-/* Grid y Tarjetas */
 .grid-libros {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -34,12 +32,10 @@
 .card h3 { margin: 0 0 10px 0; font-size: 1.3rem; }
 .card-info p { margin: 4px 0; color: #555; font-size: 0.95rem; }
 
-/* Badges */
 .badge { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; margin: 10px 0; }
 .badge.publico { background: #e8f5e9; color: #2e7d32; }
 .badge.privado { background: #ffebee; color: #c62828; }
 
-/* Botones de Acción */
 .card-actions {
   display: flex;
   gap: 10px;
@@ -51,9 +47,8 @@
 .btn-read { flex: 1; text-align: center; background: var(--piolin-blue); color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-weight: bold; }
 .btn-edit { background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
 .btn-delete { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
-.btn-locked { width: 100%; background: #ddd; color: #777; border: none; padding: 10px; border-radius: 5px; cursor: not-allowed; }
+.btn-locked { width: 100%; background: #ddd; color: #777; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
 
-/* Formularios */
 .upload-form, .auth-form {
   max-width: 450px;
   margin: 40px auto;
@@ -66,14 +61,14 @@
   gap: 15px;
 }
 
-.upload-form input, .upload-form select {
+.upload-form input, .upload-form select, .auth-form input {
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 1rem;
 }
 
-.upload-form button {
+.upload-form button, .auth-form button {
   padding: 14px;
   background: var(--piolin-dark);
   color: white;
@@ -82,3 +77,6 @@
   cursor: pointer;
   font-weight: bold;
 }
+
+.file-input-container { text-align: left; }
+.file-input-container label { font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 5px; }

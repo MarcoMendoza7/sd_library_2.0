@@ -5,11 +5,12 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 
-// CONFIGURACIÓN DE CORS
+// CONFIGURACIÓN DE CORS MEJORADA
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
+    exposedHeaders: ['Content-Disposition'] // Importante para descargas
 }));
 
 // Middleware para detectar usuario
@@ -30,7 +31,7 @@ const getUserInfo = (req, res, next) => {
 
 app.use(getUserInfo);
 
-// Proxy a Libros (PHP)
+// Proxy a Libros (PHP) - Configurado para manejar archivos PDF correctamente
 app.use('/api/libros', createProxyMiddleware({
     target: 'http://ms-libros:80', 
     changeOrigin: true,
@@ -41,6 +42,10 @@ app.use('/api/libros', createProxyMiddleware({
         } else {
             proxyReq.setHeader('X-User-ID', '0');
         }
+    },
+    onProxyRes: (proxyRes, req, res) => {
+        // Forzamos cabeceras CORS en la respuesta del proxy para evitar el bloqueo OpaqueResponse
+        proxyRes.headers['Access-Control-Allow-Origin'] = '*';
     }
 }));
 
@@ -51,7 +56,6 @@ app.use('/api/auth', createProxyMiddleware({
     pathRewrite: { '^/api/auth': '/auth' },
 }));
 
-// Ruta de salud para verificar que el Gateway VIVE
 app.get('/health', (req, res) => res.send('🐥 Gateway Piolín Vivito y Coleando'));
 
 const PORT = 3000;

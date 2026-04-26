@@ -1,18 +1,55 @@
 :root {
   --piolin-yellow: #ffd700;
   --piolin-blue: #00bcd4;
+  --piolin-orange: #ffa000;
   --piolin-dark: #333;
   --danger: #ff4d4d;
   --success: #4caf50;
+  --bg-soft: #f4f7f6;
 }
 
-.App { text-align: center; font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; min-height: 100vh; }
+.App { text-align: center; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-soft); min-height: 100vh; }
 
+/* NAVBAR */
 .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 .navbar h1 { font-size: 1.5rem; color: var(--piolin-dark); }
 .navbar button { margin-left: 10px; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; background: var(--piolin-yellow); font-weight: bold; transition: 0.3s; }
 .navbar button:hover { opacity: 0.8; }
 
+/* SECCIÓN DE DATOS DE USUARIO */
+.user-data-container {
+  padding: 20px 5% 0 5%;
+  display: flex;
+  justify-content: center;
+}
+
+.user-data-card {
+  background: white;
+  width: 100%;
+  max-width: 600px;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border-left: 5px solid var(--piolin-blue);
+  text-align: left;
+}
+
+.user-data-card h3 { margin-top: 0; color: var(--piolin-dark); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+
+.user-field { margin-bottom: 15px; }
+.user-field label { display: block; font-size: 0.85rem; font-weight: bold; color: #666; margin-bottom: 5px; }
+.user-field input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  font-size: 1rem;
+  color: #333;
+  cursor: default;
+}
+
+/* GRID DE LIBROS */
 .grid-libros {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -27,12 +64,14 @@
   text-align: left;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   border-top: 4px solid var(--piolin-yellow);
+  display: flex;
+  flex-direction: column;
 }
 
 .card h3 { margin: 0 0 10px 0; font-size: 1.3rem; }
 .card-info p { margin: 4px 0; color: #555; font-size: 0.95rem; }
 
-.badge { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; margin: 10px 0; }
+.badge { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; margin: 10px 0; width: fit-content; }
 .badge.publico { background: #e8f5e9; color: #2e7d32; }
 .badge.privado { background: #ffebee; color: #c62828; }
 
@@ -44,11 +83,17 @@
   padding-top: 15px;
 }
 
-.btn-read { flex: 1; text-align: center; background: var(--piolin-blue); color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-weight: bold; }
-.btn-edit { background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
-.btn-delete { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+.btn-read { flex: 1; text-align: center; background: var(--piolin-blue); color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-weight: bold; transition: 0.3s; cursor: pointer; border: none; }
+.btn-download { flex: 1; text-align: center; background: var(--piolin-orange); color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-weight: bold; transition: 0.3s; cursor: pointer; border: none; }
+.btn-read:hover, .btn-download:hover { opacity: 0.8; }
+
+.admin-actions { display: flex; gap: 8px; margin-top: 10px; }
+.btn-edit { flex: 1; background: var(--success); color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.btn-delete { flex: 1; background: var(--danger); color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
 .btn-locked { width: 100%; background: #ddd; color: #777; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
 
+/* FORMULARIOS */
 .upload-form, .auth-form {
   max-width: 450px;
   margin: 40px auto;
@@ -61,22 +106,8 @@
   gap: 15px;
 }
 
-.upload-form input, .upload-form select, .auth-form input {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-}
-
-.upload-form button, .auth-form button {
-  padding: 14px;
-  background: var(--piolin-dark);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
+.upload-form input, .upload-form select, .auth-form input { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+.upload-form button, .auth-form button { padding: 14px; background: var(--piolin-dark); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
 .file-input-container { text-align: left; }
 .file-input-container label { font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 5px; }

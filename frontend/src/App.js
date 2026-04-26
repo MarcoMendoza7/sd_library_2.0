@@ -28,6 +28,23 @@ function App() {
     } catch (err) { console.error("Error al cargar libros"); }
   };
 
+  const descargarArchivo = async (pdfUrl, titulo) => {
+    try {
+      const res = await fetch(pdfUrl);
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${titulo}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (err) {
+      console.error("Error en la descarga, abriendo en pestaña...", err);
+      window.open(pdfUrl, '_blank');
+    }
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     const res = await fetch(`${API_BASE}/auth/register`, {
@@ -54,7 +71,12 @@ function App() {
     const data = await res.json();
     if (data.token) {
       localStorage.setItem('token_piolin', data.token);
-      const sessionUser = { id: data.user?.id, nombre: data.user?.nombre || 'Usuario' };
+      // Guardamos nombre y email para el perfil
+      const sessionUser = { 
+        id: data.user?.id, 
+        nombre: data.user?.nombre || 'Usuario',
+        email: data.user?.email || loginData.email 
+      };
       localStorage.setItem('user_piolin', JSON.stringify(sessionUser));
       setUser(sessionUser);
       setView('home');
@@ -144,7 +166,26 @@ function App() {
       <main className="content">
         {(view === 'home' || view === 'perfil') && (
           <div className="library-section">
-            <h2>{view === 'home' ? 'Vitrina Pública' : 'Mis Libros'}</h2>
+            
+            {/* NUEVA SECCIÓN DE DATOS DEL USUARIO */}
+            {view === 'perfil' && user && (
+              <div className="user-data-container">
+                <div className="user-data-card">
+                  <h3>Mis Datos Personales 👤</h3>
+                  <div className="user-field">
+                    <label>Nombre:</label>
+                    <input type="text" value={user.nombre} readOnly />
+                  </div>
+                  <div className="user-field">
+                    <label>Correo Electrónico:</label>
+                    <input type="text" value={user.email} readOnly />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <h2>{view === 'home' ? 'Vitrina Pública' : 'Mis Libros Subidos'}</h2>
+            
             <div className="grid-libros">
               {(view === 'home' ? libros : libros.filter(l => l.user_id == user?.id)).map(l => (
                 <div key={l.id} className="card">
@@ -157,17 +198,34 @@ function App() {
                   </div>
                   <div className="card-actions">
                     {user ? (
-                      <a href={`http://localhost:3000/api/libros/uploads/${l.pdf_url}`} target="_blank" rel="noreferrer" className="btn-read" download>Descargar</a>
-                    ) : (
-                      <button className="btn-locked" onClick={() => setView('login')}>Inicia sesión para leer</button>
-                    )}
-                    {view === 'perfil' && (
                       <>
-                        <button onClick={() => prepararEdicion(l)} className="btn-edit">Editar</button>
-                        <button onClick={() => eliminarLibro(l.id)} className="btn-delete">Borrar</button>
+                        <a 
+                          href={`${API_BASE}/libros/uploads/${l.pdf_url}`} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="btn-read"
+                        >
+                          Leer
+                        </a>
+                        <button 
+                          onClick={() => descargarArchivo(`${API_BASE}/libros/uploads/${l.pdf_url}`, l.titulo)}
+                          className="btn-download"
+                        >
+                          Descargar
+                        </button>
                       </>
+                    ) : (
+                      <button className="btn-locked" onClick={() => setView('login')}>
+                        Inicia sesión para leer
+                      </button>
                     )}
                   </div>
+                  {view === 'perfil' && (
+                    <div className="admin-actions">
+                      <button onClick={() => prepararEdicion(l)} className="btn-edit">Editar</button>
+                      <button onClick={() => eliminarLibro(l.id)} className="btn-delete">Borrar</button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -145,19 +145,34 @@ function App() {
   return (
     <div className="App">
       <header className="navbar">
-        <h1>Biblioteca Piolín 🐥</h1>
-        <nav>
-          <button onClick={() => { setView('home'); setEditMode(null); }}>Inicio</button>
+        <h1>
+          <i className="ph-fill ph-books icon-piolin"></i>
+          Biblioteca Piolín
+        </h1>
+        <nav className="nav-buttons">
+          <button className="btn-nav" onClick={() => { setView('home'); setEditMode(null); }}>
+            <i className="ph ph-house"></i> Inicio
+          </button>
           {user ? (
             <>
-              <button onClick={() => setView('perfil')}>Mi Perfil 👤</button>
-              <button onClick={() => { setView('upload'); setEditMode(null); }}>Subir Libro ➕</button>
-              <button onClick={logout}>Salir ({user.nombre})</button>
+              <button className="btn-nav" onClick={() => setView('perfil')}>
+                <i className="ph ph-user"></i> Mi Perfil
+              </button>
+              <button className="btn-nav" onClick={() => { setView('upload'); setEditMode(null); }}>
+                <i className="ph ph-upload-simple"></i> Subir Libro
+              </button>
+              <button className="btn-nav" onClick={logout}>
+                <i className="ph ph-sign-out"></i> Salir ({user.nombre})
+              </button>
             </>
           ) : (
             <>
-              <button onClick={() => setView('login')}>Entrar</button>
-              <button onClick={() => setView('register')}>Crear Cuenta</button>
+              <button className="btn-nav" onClick={() => setView('login')}>
+                <i className="ph ph-sign-in"></i> Entrar
+              </button>
+              <button className="btn-nav btn-primary" onClick={() => setView('register')}>
+                Crear Cuenta
+              </button>
             </>
           )}
         </nav>
@@ -171,30 +186,35 @@ function App() {
             {view === 'perfil' && user && (
               <div className="user-data-container">
                 <div className="user-data-card">
-                  <h3>Mis Datos Personales 👤</h3>
+                  <h3><i className="ph-fill ph-identification-card"></i> Mis Datos Personales</h3>
                   <div className="user-field">
-                    <label>Nombre:</label>
+                    <label>Nombre</label>
                     <input type="text" value={user.nombre} readOnly />
                   </div>
                   <div className="user-field">
-                    <label>Correo Electrónico:</label>
+                    <label>Correo Electrónico</label>
                     <input type="text" value={user.email} readOnly />
                   </div>
                 </div>
               </div>
             )}
 
-            <h2>{view === 'home' ? 'Vitrina Pública' : 'Mis Libros Subidos'}</h2>
+            <h2 className="section-title">
+              {view === 'home' ? 'Vitrina Pública' : 'Mis Libros Subidos'}
+            </h2>
             
             <div className="grid-libros">
-              {(view === 'home' ? libros : libros.filter(l => l.user_id == user?.id)).map(l => (
+              {(view === 'home' ? libros : libros.filter(l => l.user_id === user?.id)).map(l => (
                 <div key={l.id} className="card">
                   <h3>{l.titulo}</h3>
                   <div className="card-info">
-                    <p><strong>👤 Autor:</strong> {l.autor_id}</p>
-                    <p><strong>📑 Género:</strong> {l.genero}</p>
-                    <p><strong>📅 Año:</strong> {l.anio}</p>
-                    <span className={`badge ${l.visibilidad}`}>{l.visibilidad}</span>
+                    <p><i className="ph-fill ph-user-circle"></i> {l.autor_id}</p>
+                    <p><i className="ph-fill ph-bookmark-simple"></i> {l.genero}</p>
+                    <p><i className="ph-fill ph-calendar-blank"></i> {l.anio}</p>
+                    <span className={`badge ${l.visibilidad}`}>
+                      <i className={l.visibilidad === 'publico' ? 'ph-bold ph-globe' : 'ph-bold ph-lock-key'}></i>
+                      {l.visibilidad}
+                    </span>
                   </div>
                   <div className="card-actions">
                     {user ? (
@@ -203,27 +223,31 @@ function App() {
                           href={`${API_BASE}/libros/uploads/${l.pdf_url}`} 
                           target="_blank" 
                           rel="noreferrer" 
-                          className="btn-read"
+                          className="btn-action btn-read"
                         >
-                          Leer
+                          <i className="ph-bold ph-book-open"></i> Leer
                         </a>
                         <button 
                           onClick={() => descargarArchivo(`${API_BASE}/libros/uploads/${l.pdf_url}`, l.titulo)}
-                          className="btn-download"
+                          className="btn-action btn-download"
                         >
-                          Descargar
+                          <i className="ph-bold ph-download-simple"></i> Descargar
                         </button>
                       </>
                     ) : (
                       <button className="btn-locked" onClick={() => setView('login')}>
-                        Inicia sesión para leer
+                        <i className="ph-fill ph-lock-key"></i> Inicia sesión para leer
                       </button>
                     )}
                   </div>
                   {view === 'perfil' && (
                     <div className="admin-actions">
-                      <button onClick={() => prepararEdicion(l)} className="btn-edit">Editar</button>
-                      <button onClick={() => eliminarLibro(l.id)} className="btn-delete">Borrar</button>
+                      <button onClick={() => prepararEdicion(l)} className="btn-action btn-edit">
+                        <i className="ph-bold ph-pencil-simple"></i> Editar
+                      </button>
+                      <button onClick={() => eliminarLibro(l.id)} className="btn-action btn-delete">
+                        <i className="ph-bold ph-trash"></i> Borrar
+                      </button>
                     </div>
                   )}
                 </div>
@@ -233,41 +257,83 @@ function App() {
         )}
 
         {view === 'register' && (
-          <form className="auth-form" onSubmit={handleRegister}>
-            <h2>Crear Cuenta</h2>
-            <input type="text" placeholder="Nombre" required onChange={e => setRegisterData({...registerData, nombre: e.target.value})} />
-            <input type="email" placeholder="Email" required onChange={e => setRegisterData({...registerData, email: e.target.value})} />
-            <input type="password" placeholder="Password" required onChange={e => setRegisterData({...registerData, password: e.target.value})} />
-            <button type="submit">Registrarse</button>
-          </form>
+          <div className="form-wrapper">
+            <form className="auth-form" onSubmit={handleRegister}>
+              <h2>Crear Cuenta</h2>
+              <div className="input-group">
+                <i className="ph ph-user"></i>
+                <input type="text" placeholder="Nombre" required onChange={e => setRegisterData({...registerData, nombre: e.target.value})} />
+              </div>
+              <div className="input-group">
+                <i className="ph ph-envelope-simple"></i>
+                <input type="email" placeholder="Email" required onChange={e => setRegisterData({...registerData, email: e.target.value})} />
+              </div>
+              <div className="input-group">
+                <i className="ph ph-lock-key"></i>
+                <input type="password" placeholder="Password" required onChange={e => setRegisterData({...registerData, password: e.target.value})} />
+              </div>
+              <button type="submit" className="btn-submit">Registrarse</button>
+            </form>
+          </div>
         )}
 
         {view === 'login' && (
-           <form className="auth-form" onSubmit={handleLogin}>
-             <h2>Entrar</h2>
-             <input type="email" placeholder="Email" required onChange={e => setLoginData({...loginData, email: e.target.value})} />
-             <input type="password" placeholder="Pass" required onChange={e => setLoginData({...loginData, password: e.target.value})} />
-             <button type="submit">Entrar</button>
-           </form>
+           <div className="form-wrapper">
+             <form className="auth-form" onSubmit={handleLogin}>
+               <h2>Entrar a Piolín</h2>
+               <div className="input-group">
+                 <i className="ph ph-envelope-simple"></i>
+                 <input type="email" placeholder="Email" required onChange={e => setLoginData({...loginData, email: e.target.value})} />
+               </div>
+               <div className="input-group">
+                 <i className="ph ph-lock-key"></i>
+                 <input type="password" placeholder="Pass" required onChange={e => setLoginData({...loginData, password: e.target.value})} />
+               </div>
+               <button type="submit" className="btn-submit">Entrar</button>
+             </form>
+           </div>
         )}
 
         {view === 'upload' && (
-           <form className="upload-form" onSubmit={handleUploadOrUpdate}>
-             <h2>{editMode ? 'Editar Libro' : 'Subir Nuevo Libro'}</h2>
-             <input type="text" placeholder="Título" value={libroData.titulo} required onChange={e => setLibroData({...libroData, titulo: e.target.value})} />
-             <input type="text" placeholder="Autor" value={libroData.autor} required onChange={e => setLibroData({...libroData, autor: e.target.value})} />
-             <input type="text" placeholder="Género" value={libroData.genero} required onChange={e => setLibroData({...libroData, genero: e.target.value})} />
-             <input type="number" placeholder="Año" value={libroData.anio} required onChange={e => setLibroData({...libroData, anio: e.target.value})} />
-             <select value={libroData.visibilidad} onChange={e => setLibroData({...libroData, visibilidad: e.target.value})}>
-               <option value="publico">Público</option>
-               <option value="privado">Privado</option>
-             </select>
-             <div className="file-input-container">
-                <label>{editMode ? "Actualizar PDF (opcional):" : "Archivo PDF:"}</label>
-                <input type="file" accept=".pdf" required={!editMode} onChange={e => setFile(e.target.files[0])} />
-             </div>
-             <button type="submit">{editMode ? 'Guardar Cambios' : 'Publicar'}</button>
-           </form>
+           <div className="form-wrapper">
+             <form className="upload-form" onSubmit={handleUploadOrUpdate}>
+               <h2>{editMode ? 'Editar Libro' : 'Subir Nuevo Libro'}</h2>
+               
+               <div className="input-group">
+                 <i className="ph ph-text-t"></i>
+                 <input type="text" placeholder="Título" value={libroData.titulo} required onChange={e => setLibroData({...libroData, titulo: e.target.value})} />
+               </div>
+               
+               <div className="input-group">
+                 <i className="ph ph-user-circle"></i>
+                 <input type="text" placeholder="Autor" value={libroData.autor} required onChange={e => setLibroData({...libroData, autor: e.target.value})} />
+               </div>
+               
+               <div className="input-group">
+                 <i className="ph ph-bookmark"></i>
+                 <input type="text" placeholder="Género" value={libroData.genero} required onChange={e => setLibroData({...libroData, genero: e.target.value})} />
+               </div>
+               
+               <div className="input-group">
+                 <i className="ph ph-calendar"></i>
+                 <input type="number" placeholder="Año" value={libroData.anio} required onChange={e => setLibroData({...libroData, anio: e.target.value})} />
+               </div>
+               
+               <select value={libroData.visibilidad} onChange={e => setLibroData({...libroData, visibilidad: e.target.value})}>
+                 <option value="publico">🌍 Público</option>
+                 <option value="privado">🔒 Privado</option>
+               </select>
+
+               <div className="file-input-container">
+                  <label>{editMode ? "Actualizar Archivo PDF (opcional):" : "Seleccionar Archivo PDF:"}</label>
+                  <input type="file" accept=".pdf" required={!editMode} onChange={e => setFile(e.target.files[0])} />
+               </div>
+               
+               <button type="submit" className="btn-submit">
+                 {editMode ? 'Guardar Cambios' : 'Publicar Libro'}
+               </button>
+             </form>
+           </div>
         )}
       </main>
     </div>

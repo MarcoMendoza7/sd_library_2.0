@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = "/api";
 
 function App() {
   const [libros, setLibros] = useState([]);

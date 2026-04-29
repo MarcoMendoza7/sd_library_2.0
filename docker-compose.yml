@@ -1,12 +1,26 @@
 version: '3.8'
 
 services:
-  # API GATEWAY (Node.js) - Puerto 3000
+  # NGINX - LA ÚNICA PUERTA DE ENTRADA
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx_proxy
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    networks:
+      - biblioteca-net
+    depends_on:
+      - frontend
+      - api-gateway
+
+  # API GATEWAY
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     volumes:
       - ./logs:/app/logs
     networks:
@@ -14,14 +28,14 @@ services:
     depends_on:
       - ms-libros
       - ms-autores
-      - ms-usuarios # Ahora el Gateway espera a que el servicio de usuarios esté listo
+      - ms-usuarios
 
-  # MS USUARIOS (Node.js) - NUEVO INTEGRANTE - Puerto 8003
+  # MS USUARIOS
   ms-usuarios:
     build: ./ms-usuarios
     container_name: ms-usuarios
-    ports:
-      - "8003:8003"
+    expose:
+      - "8003"
     environment:
       - DB_HOST=mysql-db
       - DB_USER=root
@@ -33,12 +47,12 @@ services:
     depends_on:
       - mysql-db
 
-  # MS LIBROS (PHP) - Puerto 8001
+  # MS LIBROS (PHP)
   ms-libros:
     build: ./ms-libros
     container_name: ms-libros
-    ports:
-      - "8001:80"
+    expose:
+      - "80"
     volumes:
       - ./logs:/var/www/html/logs
       - ./ms-libros/uploads:/var/www/html/uploads
@@ -46,34 +60,32 @@ services:
       - biblioteca-net
     depends_on:
       - mysql-db
-    
 
-  # MS AUTORES (Node.js) - Puerto 8002
+  # MS AUTORES
   ms-autores:
     build: ./ms-autores
     container_name: ms-autores
-    ports:
-      - "8002:8002"
+    expose:
+      - "8002"
     networks:
       - biblioteca-net
     depends_on:
       - mongo-db
 
-  # FRONTEND (React) - Puerto 3001
+  # FRONTEND (React)
   frontend:
     build: ./frontend
     container_name: frontend
-    ports:
-      - "3001:3001"
+    expose:
+      - "3001"
     environment:
       - PORT=3001
     networks:
       - biblioteca-net
 
-  # BASE DE DATOS MYSQL
+  # BASES DE DATOS (Mantenemos los puertos por si quieres usar Workbench/Compass)
   mysql-db:
     image: mysql:8
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     container_name: mysql-db
     environment:
       MYSQL_ROOT_PASSWORD: admin
@@ -82,11 +94,10 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Asegúrate de que el init.sql tenga la tabla usuarios
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - biblioteca-net
 
-  # BASE DE DATOS MONGODB
   mongo-db:
     image: mongo
     container_name: mongo-db
